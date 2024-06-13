@@ -26,7 +26,7 @@ DEVICE_ID -> (Placeholder, may not be needed)
 
 SUB_PATH -> This will be the path to your SD_Card folder, i.e "/Users/John/Documents/CPAP_Data/SD_Card" without the last forward slash
 
-DIR_PATH  --> This will be the path to your SD_Card folder, i.e "/Users/John/Documents/CPAP_Data/SD_Card/" WITH the last forward slash
+DIR_PATH  -> This will be the path to your SD_Card folder, i.e "/Users/John/Documents/CPAP_Data/SD_Card/" WITH the last forward slash
 
 
 Save the .env file in the same directory of the two py files above.
