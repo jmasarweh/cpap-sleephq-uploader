@@ -20,16 +20,16 @@ Prerequisits:
 
 Installation:
 
-Python3
-# #################################################################################################
-# Setup instructions for Mac users:
-#  Install HomeBrew (if you don't have it)
-#    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-#  Install Python 3 using HomeBrew
-#    brew install python
-# Install additional libraries using python's package installer
-#    pip install requests beautifulsoup4
-# #################################################################################################
+Python3 Setup instructions for Mac users:
+
+Install HomeBrew (if you don't have it)
+ /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+ 
+Install Python 3 using HomeBrew
+ brew install python
+ 
+Install additional libraries using python's package installer
+ pip install requests beautifulsoup4
 
 
 You will first need to grab your API Keys and Secreats from the SleepHQ Account Settings section/API Keys.
