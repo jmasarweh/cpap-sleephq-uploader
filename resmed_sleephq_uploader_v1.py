@@ -22,11 +22,9 @@ client_id = os.getenv('CLIENT_ID')
 client_secret = os.getenv('CLIENT_SECRET')
 sub_path = os.getenv('SUB_PATH')
 dir_path = os.getenv('DIR_PATH')
-print(client_id)
 
 # Get the Access Token from SleepHQ
 def get_access_token(client_id, client_secret):
-    print(client_id, client_secret)
     url = "https://sleephq.com/oauth/token"
     payload = {
         'client_id': client_id,
