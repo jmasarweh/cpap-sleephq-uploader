@@ -22,13 +22,13 @@ Installation:
 
 Python3 Setup instructions for Mac users:
 
-Install HomeBrew (if you don't have it)
+Install HomeBrew (if you don't have it): 
  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
  
-Install Python 3 using HomeBrew
+Install Python 3 using HomeBrew: 
  brew install python
  
-Install additional libraries using python's package installer
+Install additional libraries using python's package installer: 
  pip install requests beautifulsoup4
 
 
