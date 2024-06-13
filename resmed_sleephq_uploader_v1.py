@@ -1,3 +1,8 @@
+# ################################################################################################
+# You must install python3 for macOS 10.9 and later	. https://www.python.org/downloads/macos/
+# You also must change the variables and Id in the Variables Section of .env file in this repo.
+# #################################################################################################
+
 import requests
 import hashlib
 import os
@@ -10,13 +15,8 @@ from dotenv import load_dotenv  # For loading environment variables
 
 # Load environment variables
 load_dotenv()
-# Load sensitive data from environment variables
-# ################################################################################################
-# You must install python3 for macOS 10.9 and later	. https://www.python.org/downloads/macos/
-# You also must change the variables and Id in the Variables Section of .env file in this repo.
-# #################################################################################################
 
-# team_id = os.getenv('TEAM_ID')
+# team_id = os.getenv('TEAM_ID') ignored for now
 device_id = os.getenv('DEVICE_ID')
 client_id = os.getenv('CLIENT_ID')
 client_secret = os.getenv('CLIENT_SECRET')
@@ -24,6 +24,7 @@ sub_path = os.getenv('SUB_PATH')
 dir_path = os.getenv('DIR_PATH')
 print(client_id)
 
+# Get the Access Token from SleepHQ
 def get_access_token(client_id, client_secret):
     print(client_id, client_secret)
     url = "https://sleephq.com/oauth/token"
@@ -42,7 +43,7 @@ def get_access_token(client_id, client_secret):
         print(f"Failed to get access token: {e}")
         sys.exit(1)
 
-
+# Creates an MD5 Hashed checksum of the files
 def calculate_md5(file_path):
     hasher = hashlib.md5()
     with open(file_path, 'rb') as f:
@@ -50,7 +51,7 @@ def calculate_md5(file_path):
             hasher.update(chunk)
     return hasher.hexdigest()
 
-
+# Retrieves your Team Id from Sleep HQ
 def get_team_id(authorization):
     url = "https://sleephq.com/api/v1/me"
     headers = {
@@ -66,7 +67,8 @@ def get_team_id(authorization):
         print(f"Failed to get Team Id: {e}")
         sys.exit(1)
 
-
+# Prepares the files for import and adds them to a collection and a JSON dump for 
+# later processing in the request payload
 def collect_files(dir_path, sub_path):
     all_files = [file for file in pathlib.Path(dir_path).rglob("*") if file.is_file() and not file.name.startswith('.')]
     import_files = defaultdict(list)
@@ -78,7 +80,7 @@ def collect_files(dir_path, sub_path):
         import_files['content_hash'].append(calculate_md5(file))
     return import_files
 
-
+# Obtains an Import Reservation Id from SleepHQ
 def reserve_import_id(team_id, authorization):
     url = f"https://sleephq.com/api/v1/teams/{team_id}/imports"
     headers = {'Authorization': authorization, 'Accept': 'application/json'}
@@ -91,7 +93,7 @@ def reserve_import_id(team_id, authorization):
         print(f"Failed to reserve import ID: {e}")
         sys.exit(1)
 
-
+# Uploads the files, one by one to SleepHQ
 def upload_files(import_id, authorization, final_import_files_list, dir_path):
     url = f"https://sleephq.com/api/v1/imports/{import_id}/files"
     headers = {'Authorization': authorization}
@@ -109,7 +111,7 @@ def upload_files(import_id, authorization, final_import_files_list, dir_path):
             sys.exit(1)
         time.sleep(1.5)
 
-
+# Closes the Import and starts the processing of the uploaded files
 def process_imported_files(import_id, authorization):
     url = f"https://sleephq.com/api/v1/imports/{import_id}/process_files"
     headers = {
