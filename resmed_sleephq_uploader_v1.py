@@ -9,23 +9,23 @@ import time
 from dotenv import load_dotenv  # For loading environment variables
 
 # Load environment variables
-
 load_dotenv()
-
+# Load sensitive data from environment variables
 # ################################################################################################
 # You must install python3 for macOS 10.9 and later	. https://www.python.org/downloads/macos/
-# You also must change the variables and Id in the .env file, which will be called below
-# # #################################################################################################
+# You also must change the variables and Id in the Variables Section
+# #################################################################################################
 
-team_id = os.getenv('TEAM_ID')
+# team_id = os.getenv('TEAM_ID')
 device_id = os.getenv('DEVICE_ID')
 client_id = os.getenv('CLIENT_ID')
 client_secret = os.getenv('CLIENT_SECRET')
 sub_path = os.getenv('SUB_PATH')
 dir_path = os.getenv('DIR_PATH')
-print(client_id, client_secret, sub_path, dir_path)
+print(client_id)
 
 def get_access_token(client_id, client_secret):
+    print(client_id, client_secret)
     url = "https://sleephq.com/oauth/token"
     payload = {
         'client_id': client_id,
@@ -49,6 +49,22 @@ def calculate_md5(file_path):
         for chunk in iter(lambda: f.read(4096), b''):
             hasher.update(chunk)
     return hasher.hexdigest()
+
+
+def get_team_id(authorization):
+    url = "https://sleephq.com/api/v1/me"
+    headers = {
+        'Authorization': authorization,
+        'Accept': 'application/json'
+    }
+    try:
+        response = requests.request("GET", url, headers=headers)
+        response.raise_for_status()
+        print("Team Id retrieved successfully")
+        return response.json()['data']['current_team_id']
+    except requests.RequestException as e:
+        print(f"Failed to get Team Id: {e}")
+        sys.exit(1)
 
 
 def collect_files(dir_path, sub_path):
@@ -116,6 +132,7 @@ import_files = collect_files(dir_path, sub_path)
 ordered_import_files = [OrderedDict([('path', t), ('name', d), ('content_hash', c)]) for t, d, c in
                         zip(import_files['path'], import_files['name'], import_files['content_hash'])]
 final_import_files_list = json.loads(json.dumps(ordered_import_files))
+team_id = get_team_id(authorization)
 import_id = reserve_import_id(team_id, authorization)
 upload_files(import_id, authorization, final_import_files_list, dir_path)
 process_imported_files(import_id, authorization)
