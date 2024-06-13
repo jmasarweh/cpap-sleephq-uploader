@@ -1,5 +1,5 @@
 # ################################################################################################
-# You must install python3 for macOS 10.9 and later	. https://www.python.org/downloads/macos/
+# You must install python3 for macOS 10.9 and later: https://www.python.org/downloads/macos/
 # You also must change the variables and Id in the Variables Section of .env file in this repo.
 # #################################################################################################
 
