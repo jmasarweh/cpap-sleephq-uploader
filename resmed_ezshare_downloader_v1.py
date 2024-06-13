@@ -48,9 +48,11 @@
 # ./run_foo.sh --start_from 20230101 --show_progress Verbose --overwrite
 # #################################################################################################
 
-import argparse
 # #################################################################################################
 # Required imports -- don't modify.
+# #################################################################################################
+
+import argparse
 import os
 import platform
 import shutil
@@ -59,18 +61,26 @@ import time
 import urllib.parse
 from datetime import datetime, timedelta
 from subprocess import run, PIPE
-
+from dotenv import load_dotenv  # For loading environment variables
 import requests
 from bs4 import BeautifulSoup
 
 ###################################################################################################
 
+load_dotenv()
+
 # #################################################################################################
 # Location to save the files. Modify to your preferred location as needed:
-root_path = os.path.join(os.path.expanduser('~'), "Documents", "CPAP_Data", "SD_card")
-# root_path = 'C:\Users\USERNAME\Documents\CPAP_Data\SD_card'
-# root_path = '/home/USERNAME/Documents/CPAP_Data/SD_card'
+# Windows: root_path = 'C:\Users\USERNAME\Documents\CPAP_Data\SD_card'
+# Mac: root_path = '/Users/USERNAME/Documents/CPAP_Data/SD_card'
 # #################################################################################################
+
+root_path = os.path.join(os.path.expanduser('~'), "Documents", "CPAP_Data", "SD_card")
+
+MY_DIR_PATH = os.getenv('DIR_PATH')
+DATALOG_FOLDER = str(MY_DIR_PATH) + "DATALOG"
+
+###################################################################################################
 
 tod = datetime.today()
 yester = tod - timedelta(days=1)
@@ -90,17 +100,20 @@ OVERWRITE_EXISTING_FILES = True
 # If you're on ethernet, it should still work unless your DHCP is set to 192.168.4
 # Update the DATALOG_FOLDER path to the Path of the DATALOG Folder on your machine
 ######################################################################################
-USE_NETWORK_SWITCHING = True
 
+USE_NETWORK_SWITCHING = True
 EZSHARE_NETWORK = "EzShareWifiName"
 EZSHARE_PASSWORD = "EzShareWifiPass"
 CONNECTION_DELAY = 5
-DATALOG_FOLDER = "/Users/YourUserFolder/Documents/CPAP_Data/SD_Card/DATALOG"
+
 
 # #################################################################################################
 # Typically shouldn't need to edit anything after this point
 # #################################################################################################
+
+
 root_url = 'http://192.168.4.1/dir?dir=A:'
+
 for filename in os.listdir(DATALOG_FOLDER):
     file_path = os.path.join(DATALOG_FOLDER, filename)
     try:
@@ -110,9 +123,11 @@ for filename in os.listdir(DATALOG_FOLDER):
             shutil.rmtree(file_path)
     except Exception as e:
         print('Failed to delete %s. Reason: %s' % (file_path, e))
+        
 # #################################################################################################
 # Allow command line arguments to overwrite defaults
 # #################################################################################################
+
 parser = argparse.ArgumentParser(description='Your script description')
 parser.add_argument('--start_from', type=str, help='Start from date or number of days')
 parser.add_argument('--show_progress', choices=['True', 'False', 'Verbose'], help='Show progress level')
@@ -138,6 +153,7 @@ if SHOW_PROGRESS not in [True, False, 'Verbose']:
 # #################################################################################################
 # Based upon the start_from setting in the config block vs folder name, sends a yes or no to caller
 # #################################################################################################
+
 def should_process_folder(folder_name, path):
     start_from_date = START_FROM
     if 'DATALOG' not in path:
@@ -155,6 +171,7 @@ def should_process_folder(folder_name, path):
 # #################################################################################################
 # Extracts file names and links to files from directory listing html content
 # #################################################################################################
+
 def get_files_and_dirs(url):
     html_content = requests.get(url)
     soup = BeautifulSoup(html_content.text, 'html.parser')
@@ -185,6 +202,7 @@ def get_files_and_dirs(url):
 # #################################################################################################
 # Grab a single file from the SD card. It retries 3x in case the wifi is spotty.
 # #################################################################################################
+
 def download_file(url, filename, retries=3):
     for attempt in range(retries):
         try:
@@ -204,6 +222,7 @@ def download_file(url, filename, retries=3):
 # #################################################################################################
 # Determine if folders should be included or skipped, create new folders where necessary
 # #################################################################################################
+
 def check_dirs(dirs, url, dir_path):
     for dirname, dir_url in dirs:
         if dirname != 'System Volume Information':
@@ -219,6 +238,7 @@ def check_dirs(dirs, url, dir_path):
 # #################################################################################################
 # Determine if files should be downloaded or skipped
 # #################################################################################################
+
 def check_files(files, url, dir_path):
     for filename, file_url in files:
         local_path = os.path.join(dir_path, filename)
@@ -260,6 +280,7 @@ def controller(url, dir_path):
 # #################################################################################################
 # Wifi Connect - If enabled, check OS, and if MacOS, switch wifi to the EZShare SSID
 # #################################################################################################
+
 def connect_to_wifi(ssid, password=None):
     if platform.system() != 'Darwin':
         response = input(f"""
@@ -289,10 +310,10 @@ def connect_to_wifi(ssid, password=None):
             else:
                 return False
 
-
 # #################################################################################################
 # WIFI Disconnect - Dropping the wifi interface briefly makes MacOS reconnect to the default SSID
 # #################################################################################################
+
 def disconnect_from_wifi():
     # Turn off the Wi-Fi interface (en0)
     run('networksetup -setairportpower en0 off', shell=True)
@@ -303,6 +324,7 @@ def disconnect_from_wifi():
 # #################################################################################################
 # Execution Block
 # #################################################################################################
+
 if USE_NETWORK_SWITCHING:
     print(f"Connecting to {EZSHARE_NETWORK}. Waiting a few seconds for connection to establish...")
     if connect_to_wifi(EZSHARE_NETWORK, EZSHARE_PASSWORD):
@@ -317,4 +339,5 @@ if USE_NETWORK_SWITCHING:
     print(f"\nExiting {EZSHARE_NETWORK}. Waiting a few seconds for connection to establish...")
     disconnect_from_wifi()
     time.sleep(CONNECTION_DELAY)
+
 # END
