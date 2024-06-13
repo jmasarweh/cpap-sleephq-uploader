@@ -49,7 +49,9 @@ Save the .env file in the same directory of the two py files above.
 
 Important Info:
 
-The modules will only upload the last night's data. It will not upload any prior data. It can be tweaked to handle all the files, but you would need to be realise that for mass uploads, the SleepHQ.com web UI is much faster.
+The downloader file uses Wifi Switching to connect to the EzShare SSD and disconnect to reconnect to your home/own wifi. This is only supported on MacOs for now.
+
+The modules will only upload the last night's data. It will not upload any prior data. It can be tweaked to handle all the files, but you will realise that for mass uploads, the SleepHQ.com web UI is much faster.
 
 The modules have been tested for the folders and directory structure above. You can have your own paths, as long as the absolute path to the SD_Card folder is consistent with SUB_PATH and DIR_PATH above.
 
