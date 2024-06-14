@@ -42,7 +42,7 @@ You may need to use `pip3` in the commands above instead of `pip`, if your homeb
 
 ## Populating the .env file
 
-You will first need to grab your API Keys and Secreats from the SleepHQ Account Settings section/API Keys.
+You will first need to grab your API Keys and Secrets from the SleepHQ Account Settings (bottom left of the page) then find the API Keys section.
 
 `CLIENT_ID` -> This is your Client Id from the SleepHQ Account Settings section/API Keys
 
