@@ -6,9 +6,9 @@ Uploads CPAP data to the SleepHQ Cloud.
 
 The uploader consists of two main executable python3 files:
 
--ezshare_downloader_v1.py which will download your cpap files stored on an Ezshare Wifi SD Card plugged in to your machine (credit to: @JCOvergaar https://github.com/JCOvergaar)
+-ezshare_downloader_vX.py which will download your cpap files stored on an Ezshare Wifi SD Card plugged in to your machine (credit to: @JCOvergaar https://github.com/JCOvergaar)
 
--resmed_sleephq_uploader_v2.py which will take the dowloaded files from the first module above, and upload them to https://sleepHQ.com
+-resmed_sleephq_uploader_vX.py which will take the dowloaded files from the first module above, and upload them to https://sleepHQ.com
 
 ## Prerequisits
 
