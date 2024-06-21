@@ -143,7 +143,8 @@ def check_imported_files(import_id, authorization):
     try:
         response = requests.get(url, headers=headers)
         response.raise_for_status()
-        if not str(response.json()['data']['attributes']['failed_reason']):
+        # Check if failed_reason from the json has any value
+        if str(response.json()['data']['attributes']['failed_reason']):
             print("Processing failed: " + response.json()['data']['attributes']['failed_reason'])
 
     except requests.RequestException as e:
