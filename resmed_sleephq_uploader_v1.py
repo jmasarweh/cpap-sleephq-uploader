@@ -23,6 +23,7 @@ client_secret = os.getenv('CLIENT_SECRET')
 sub_path = os.getenv('SUB_PATH')
 dir_path = os.getenv('DIR_PATH')
 
+
 # Get the Access Token from SleepHQ
 def get_access_token(client_id, client_secret):
     url = "https://sleephq.com/oauth/token"
@@ -41,6 +42,7 @@ def get_access_token(client_id, client_secret):
         print(f"Failed to get access token: {e}")
         sys.exit(1)
 
+
 # Creates an MD5 Hashed checksum of the files
 def calculate_md5(file_path):
     hasher = hashlib.md5()
@@ -48,6 +50,7 @@ def calculate_md5(file_path):
         for chunk in iter(lambda: f.read(4096), b''):
             hasher.update(chunk)
     return hasher.hexdigest()
+
 
 # Retrieves your Team Id from Sleep HQ
 def get_team_id(authorization):
@@ -59,13 +62,13 @@ def get_team_id(authorization):
     try:
         response = requests.request("GET", url, headers=headers)
         response.raise_for_status()
-        print("Team Id retrieved successfully")
         return response.json()['data']['current_team_id']
     except requests.RequestException as e:
         print(f"Failed to get Team Id: {e}")
         sys.exit(1)
 
-# Prepares the files for import and adds them to a collection and a JSON dump for 
+
+# Prepares the files for import and adds them to a collection and a JSON dump for
 # later processing in the request payload
 def collect_files(dir_path, sub_path):
     all_files = [file for file in pathlib.Path(dir_path).rglob("*") if file.is_file() and not file.name.startswith('.')]
@@ -73,10 +76,11 @@ def collect_files(dir_path, sub_path):
     for file in all_files:
         long_path = os.path.abspath(file.parent)
         final_path = long_path.replace(sub_path, '.')
-        import_files['path'].append(final_path + '/' + file.name)
+        import_files['path'].append(final_path + '/')
         import_files['name'].append(file.name)
         import_files['content_hash'].append(calculate_md5(file))
     return import_files
+
 
 # Obtains an Import Reservation Id from SleepHQ
 def reserve_import_id(team_id, authorization):
@@ -91,14 +95,16 @@ def reserve_import_id(team_id, authorization):
         print(f"Failed to reserve import ID: {e}")
         sys.exit(1)
 
+
 # Uploads the files, one by one to SleepHQ
 def upload_files(import_id, authorization, final_import_files_list, dir_path):
     url = f"https://sleephq.com/api/v1/imports/{import_id}/files"
     headers = {'Authorization': authorization}
     for value in final_import_files_list:
         os_path = str(value['path']).strip("./")
-        file_path = os.path.join(dir_path, os_path)
+        file_path = os.path.join(dir_path, os_path, value['name'])
         payload = value
+        print(payload)
         files = [('file', (value['name'], open(file_path, 'rb'), 'application/octet-stream'))]
         try:
             response = requests.post(url, headers=headers, data=payload, files=files)
@@ -108,6 +114,7 @@ def upload_files(import_id, authorization, final_import_files_list, dir_path):
             print(f"Failed to upload file {value['name']}: {e}")
             sys.exit(1)
         time.sleep(1.5)
+
 
 # Closes the Import and starts the processing of the uploaded files
 def process_imported_files(import_id, authorization):
@@ -126,13 +133,37 @@ def process_imported_files(import_id, authorization):
         sys.exit(1)
 
 
+# Check the Import processing of the uploaded files
+def check_imported_files(import_id, authorization):
+    url = f"https://sleephq.com/api/v1/imports/{import_id}"
+    headers = {
+        'Authorization': authorization,
+        'Accept': 'application/json'
+    }
+    try:
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
+        if not str(response.json()['data']['attributes']['failed_reason']):
+            print("Processing failed: " + response.json()['data']['attributes']['failed_reason'])
+
+    except requests.RequestException as e:
+        print(f"Failed to process imported files: {e}")
+        print(f"But you can try the Process Import request again later by calling: {url}")
+        sys.exit(1)
+
+
 # Main workflow
 authorization = get_access_token(client_id, client_secret)
 import_files = collect_files(dir_path, sub_path)
 ordered_import_files = [OrderedDict([('path', t), ('name', d), ('content_hash', c)]) for t, d, c in
                         zip(import_files['path'], import_files['name'], import_files['content_hash'])]
 final_import_files_list = json.loads(json.dumps(ordered_import_files))
+print(final_import_files_list)
 team_id = get_team_id(authorization)
+print(f"Team Id retrieved successfully: {team_id}")
 import_id = reserve_import_id(team_id, authorization)
+print(f"Import Id reserved successfully: {import_id}")
 upload_files(import_id, authorization, final_import_files_list, dir_path)
 process_imported_files(import_id, authorization)
+time.sleep(3)
+check_imported_files(import_id, authorization)
