@@ -18,7 +18,7 @@ The uploader consists of two main executable python3 files:
 
 -The ezshare_downloader module will delete anything in the SD_Card and DATALOG folders, so make sure you have backed these up. The deletion occurs to ensure clean fresh data is sent to SleepHQ at each run.
 
--Offcourse you will need a Wifi Enabled SD Card inserted into your Resmed Machine. Amazon or Ebay has a few you can look at. The one I bought is from EzShare on Amazon.
+-Offcourse you will need a Wifi Enabled SD Card inserted into your Resmed Machine. Amazon or Ebay has a few you can look at. The one I bought is from EzShare on Amazon. The EzShare (or Any Wifi SD Card) acts an adapter. You will need a micro SD Card to store the data. The micro SD is then plugged into the Wifi SD Card.
 
 ## Installation
 
