@@ -32,7 +32,7 @@ Install Python 3 using HomeBrew:
 
  `brew install python`
  
-Install additional libraries using python's package installer:
+Install the web scrapper library (BeautifulSoup4) using python's package installer:
 
 `pip install requests beautifulsoup4`
 
